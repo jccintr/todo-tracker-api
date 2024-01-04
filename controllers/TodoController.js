@@ -92,3 +92,42 @@ export const complete = async (req,res) => {
         res.status(500).json({message:"Falha ao alterar todo."});
     }
 };
+
+export const destroy = async (req,res) => { 
+
+    const token = req.headers.token;
+
+    if(!token){
+      return  res.status(403).json({message:"Não autorizado"});
+    }
+
+    try {
+        var decoded = jsonwebtoken.verify(token,process.env.JWT_SECRET);
+    } catch (error) {
+       return res.status(403).json({message:"Não autorizado"});
+    }
+    
+    const userId = decoded.userId;
+
+
+    try {
+        const todoId = req.params.todoId;
+        const user = await User.findById(userId);
+        const deleteIndex = user?.todos.indexOf(todoId);
+        user?.todos.splice(deleteIndex,1)
+        await user.save();
+        const deletedTodo = await Todo.findByIdAndDelete(todoId);
+       
+        if(!deletedTodo){
+            return res.status(404).json({message: "Todo not found"});
+        } else {
+            return res.status(200).json({message:"Todo deleted"});
+        }
+
+    } catch (error) {
+        console.log("falha ao excluir todo",error);
+        res.status(500).json({message:"Falha ao excluir todo."});
+    }
+
+
+}
