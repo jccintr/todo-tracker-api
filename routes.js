@@ -1,6 +1,5 @@
 
 import { Router } from 'express';
-import Todo from "./models/todo.js";
 import * as TodoController from "./controllers/TodoController.js";
 import * as AuthController from "./controllers/AuthController.js";
 
